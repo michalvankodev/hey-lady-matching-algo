@@ -1,33 +1,33 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-export async function seedInterests() {
-  const interests = [
-    "Programming",
-    "Reading",
-    "Sports",
-    "Board games",
-    "Cats",
-    "Dogs",
-    "Food",
-    "History",
-    "Music",
-    "Cooking",
-    "Politics",
-    "Hiking",
-    "Running",
-    "TV/Series",
-    "Animals",
-    "Gaming",
-    "Art",
-    "Craft",
-    "Writing",
-    "Marketing",
-    "Travel",
-    "Photography",
-    "Dance",
-  ];
+export const interests = [
+  "Programming",
+  "Reading",
+  "Sports",
+  "Board games",
+  "Cats",
+  "Dogs",
+  "Food",
+  "History",
+  "Music",
+  "Cooking",
+  "Politics",
+  "Hiking",
+  "Running",
+  "TV/Series",
+  "Animals",
+  "Gaming",
+  "Art",
+  "Craft",
+  "Writing",
+  "Marketing",
+  "Travel",
+  "Photography",
+  "Dance",
+];
 
+export async function seedInterests() {
   const records = await Promise.allSettled(
     interests.map((name) =>
       prisma.interests.create({

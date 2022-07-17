@@ -1,5 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { PrismaClient } from "@prisma/client";
+import { interests } from "./interests";
 
 export const amountOfRandomUsers = 100;
 
@@ -17,6 +18,9 @@ export async function seedUsers() {
           weekAvailabilityEnd: 20,
           weekendAvailabilityStart: 10,
           weekendAvailabilityEnd: 18,
+          interests: {
+            connect: [{ id: 1 }, { id: 2 }, { id: 3 }],
+          },
         },
       },
     },
@@ -26,6 +30,10 @@ export async function seedUsers() {
     (_, i) => {
       const name = faker.name.firstName("female") + i;
       const email = `${name}@seed.me`;
+      const numberOfInterest = faker.mersenne.rand(8, 3);
+      const usersInterests = Array.from({ length: numberOfInterest }).map(
+        () => ({ id: faker.mersenne.rand(interests.length + 1, 1) })
+      );
 
       return prisma.user.create({
         data: {
@@ -38,6 +46,9 @@ export async function seedUsers() {
               weekAvailabilityEnd: faker.mersenne.rand(23),
               weekendAvailabilityStart: faker.mersenne.rand(23),
               weekendAvailabilityEnd: faker.mersenne.rand(23),
+              interests: {
+                connect: usersInterests,
+              },
             },
           },
         },

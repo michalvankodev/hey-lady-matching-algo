@@ -1,3 +1,5 @@
+import { z } from "zod";
+import * as trpc from "@trpc/server";
 import { createRouter } from "./context";
 
 const ConfidenceLevelMap = {
@@ -17,25 +19,62 @@ function getAvailableHours(start, end) {
   return diff;
 }
 
-export const membersRouter = createRouter().query("getAll", {
-  async resolve({ ctx }) {
-    const users = await ctx.prisma.user.findMany({
-      include: { profile: { include: { interests: true } } },
-    });
-    return users.map(({ id, name, profile }) => ({
-      id,
-      name,
-      englishConfidenceLevel:
-        ConfidenceLevelMap[profile!.englishConfidenceLevel as ConfidenceKey],
-      hoursInWeek: getAvailableHours(
-        profile?.weekAvailabilityEnd,
-        profile?.weekAvailabilityStart
-      ),
-      hoursInWeekend: getAvailableHours(
-        profile?.weekendAvailabilityEnd,
-        profile?.weekendAvailabilityStart
-      ),
-      numberOfInterests: profile?.interests.length,
-    }));
-  },
-});
+export const membersRouter = createRouter()
+  .query("getAll", {
+    async resolve({ ctx }) {
+      const users = await ctx.prisma.user.findMany({
+        include: { profile: { include: { interests: true } } },
+      });
+      return users.map(({ id, name, profile }) => ({
+        id,
+        name,
+        englishConfidenceLevel:
+          ConfidenceLevelMap[profile!.englishConfidenceLevel as ConfidenceKey],
+        hoursInWeek: getAvailableHours(
+          profile?.weekAvailabilityEnd,
+          profile?.weekAvailabilityStart
+        ),
+        hoursInWeekend: getAvailableHours(
+          profile?.weekendAvailabilityEnd,
+          profile?.weekendAvailabilityStart
+        ),
+        numberOfInterests: profile?.interests.length,
+      }));
+    },
+  })
+  .query("getProfile", {
+    input: z.number(),
+    async resolve({ ctx, input }) {
+      const user = await ctx.prisma.user.findFirst({
+        where: { id: input },
+        include: { profile: { include: { interests: true } } },
+      });
+      if (!user) {
+        throw new trpc.TRPCError({
+          code: "BAD_REQUEST",
+          message: "Member has not been found.",
+        });
+      }
+
+      const { id, name, profile } = user;
+      const {
+        weekAvailabilityStart,
+        weekAvailabilityEnd,
+        weekendAvailabilityStart,
+        weekendAvailabilityEnd,
+        interests,
+      } = profile!;
+
+      return {
+        id,
+        name,
+        englishConfidenceLevel:
+          ConfidenceLevelMap[profile!.englishConfidenceLevel as ConfidenceKey],
+        weekAvailabilityStart,
+        weekAvailabilityEnd,
+        weekendAvailabilityStart,
+        weekendAvailabilityEnd,
+        interests,
+      };
+    },
+  });
