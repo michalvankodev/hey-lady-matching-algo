@@ -11,6 +11,39 @@ datasource db {
     // url      = env("DATABASE_URL")
 }
 
-model Example {
-    id String @id @default(cuid())
+model User {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    email     String   @unique
+    name      String?
+    profile   UserProfile?
+    events    Event[]
+}
+
+model UserProfile {
+    id              Int  @id @default(autoincrement())
+    user            User @relation(fields: [userId], references: [id])
+    userId          Int  @unique
+    interests       Interests[]
+    englishConfidenceLevel      Int
+    // all are represented as a **hour in a day in GMT**
+    weekAvailabilityStart       Int
+    weekAvailabilityEnd         Int
+    weekendAvailabilityStart    Int
+    weekendAvailabilityEnd      Int
+}
+
+model Interests {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    name      String 
+    users     UserProfile[]
+}
+
+model Event {
+    id            Int      @id @default(autoincrement())
+    createdAt     DateTime @default(now())
+    startTime     DateTime
+    name          String
+    attendees     User[]
 }
