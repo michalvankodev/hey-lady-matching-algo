@@ -41,8 +41,6 @@ const Home: NextPage = () => {
           </p><p>
           See <code>README.md</code> for more details.
         </p>
-        <h3 className="text-2xl text-gray-700">List of members</h3>
-        <p>Choose a member to list their profile and matching profiles</p>
       </div>
     </>
   );
