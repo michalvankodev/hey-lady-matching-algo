@@ -1,16 +1,8 @@
 import type { NextPage } from "next";
 import Link from "next/link";
 import Head from "next/head";
-import { trpc } from "../utils/trpc";
-
-// TODO
-// List and preview profiles
-// Create a matching algo for similar profiles
 
 const Home: NextPage = () => {
-  // TODO Clean this up
-  const hello = trpc.useQuery(["example.hello", { text: "from tRPC" }]);
-
   return (
     <>
       <Head>
@@ -31,6 +23,7 @@ const Home: NextPage = () => {
           <a
             href="https://github.com/mmmenglish/interview/blob/main/README.md"
             target="_blank"
+            rel="noreferrer"
           >
             interview assignment
           </a>
@@ -50,10 +43,6 @@ const Home: NextPage = () => {
         </p>
         <h3 className="text-2xl text-gray-700">List of members</h3>
         <p>Choose a member to list their profile and matching profiles</p>
-
-        <div className="pt-6 text-2xl text-blue-500 flex justify-center items-center w-full">
-          {hello.data ? <p>{hello.data.greeting}</p> : <p>Loading..</p>}
-        </div>
       </div>
     </>
   );

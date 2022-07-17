@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Link from "next/link";
 import {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
@@ -9,6 +10,10 @@ const ProfilePage = (
   props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) => {
   const profile = trpc.useQuery(["members.getProfile", Number(props.id)]);
+  const suggestedFollows = trpc.useQuery([
+    "members.getSuggestedFollows",
+    Number(props.id),
+  ]);
 
   return (
     <>
@@ -39,14 +44,35 @@ const ProfilePage = (
               Weekend availability: {profile.data.weekendAvailabilityStart}:00 -{" "}
               {profile.data.weekendAvailabilityEnd}:00 UTC
             </p>
-            <p className="text-left">Interests
-            <ul>
+            <p className="text-left w-64 m-3 text-[1.4rem]">Interests</p>
+            <ul className="list-disc">
               {profile.data.interests.map(({ name }) => (
-                <li key="name">{name}</li>
+                <li key="name" className="text-left w-64 px-1">
+                  {name}
+                </li>
               ))}
-            </ul></p>
+            </ul>
           </>
         ) : null}
+
+        {suggestedFollows.data?.length ?? 0 > 0 ? (
+          <>
+            <p className="text-left w-64 m-3 text-[1.4rem]">
+              Suggested members to follow
+            </p>
+            <ul className="list-decimal">
+              {suggestedFollows.data!.map(({ user, score }) => (
+                <li key={user.id} className="text-left w-64 px-1">
+                  <Link href={`/profile/${user.id}`}>
+                    <a>{user.name}</a>
+                  </Link>
+                  {" "} with score of {score.toFixed(3)} 
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : null}
+        <Link href={"/members"}><a>List of all members</a></Link>
       </div>
     </>
   );
